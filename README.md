@@ -1,142 +1,120 @@
-Task Management API
+# Task Management API
 
 A production-style Task Management REST API built with FastAPI, SQLAlchemy, and JWT authentication.
 
-This project demonstrates real backend engineering patterns:
+This project demonstrates real backend engineering patterns including authentication, authorization, testing, and clean architecture.
 
-Authentication & authorization
+---
 
-Database modeling
+## Features
 
-Dependency injection
+- User registration and login
+- JWT-based authentication
+- CRUD operations for tasks
+- User-level authorization (users only access their own tasks)
+- SQLite database for local development
+- Automated tests with pytest
 
-Automated testing
+---
 
-Clean project structure
+## Tech Stack
 
-🚀 Features
+- Python 3.12
+- FastAPI
+- SQLAlchemy
+- SQLite
+- Pydantic
+- Pytest
+- Uvicorn
+- python-jose (JWT)
 
-User registration & login
+---
 
-JWT-based authentication
+## Project Structure
 
-CRUD operations for tasks
-
-User-level task isolation (users can only access their own tasks)
-
-SQLite database (easy local setup)
-
-Pytest test suite with isolated test database
-
-🛠 Tech Stack
-
-Python 3.12
-
-FastAPI
-
-SQLAlchemy
-
-SQLite
-
-Pydantic
-
-Pytest
-
-Uvicorn
-
-JWT (python-jose)
-
-📂 Project Structure
 task-management-api/
-├── app/
-│   ├── main.py        # FastAPI app & routes
-│   ├── models.py     # SQLAlchemy models
-│   ├── schemas.py    # Pydantic schemas
-│   ├── auth.py       # JWT & password hashing
-│   ├── crud.py       # Database operations
-│   ├── deps.py       # Dependency injection
-│   └── db.py         # Database configuration
-├── tests/
-│   ├── test_auth.py
-│   └── test_tasks.py
-├── requirements.txt
-├── README.md
-└── .gitignore
+- app/
+  - main.py        (FastAPI app and routes)
+  - models.py     (Database models)
+  - schemas.py    (Request and response schemas)
+  - auth.py       (JWT and password hashing)
+  - crud.py       (Database operations)
+  - deps.py       (Dependency injection)
+  - db.py         (Database configuration)
+- tests/
+  - test_auth.py
+  - test_tasks.py
+- requirements.txt
+- README.md
 
-▶️ Running Locally
-1. Clone the repository
-git clone https://github.com/DChahbar/task-management-api.git
-cd task-management-api
+---
 
-2. Create and activate a virtual environment
+## Running Locally
 
-Windows
+1. Clone the repository  
+   git clone https://github.com/DChahbar/task-management-api.git
 
-python -m venv .venv
-.venv\Scripts\activate
+2. Navigate into the project  
+   cd task-management-api
 
+3. Create a virtual environment  
+   python -m venv .venv
 
-macOS / Linux
+4. Activate the environment  
+   Windows: .venv\Scripts\activate  
+   macOS/Linux: source .venv/bin/activate
 
-python3 -m venv .venv
-source .venv/bin/activate
+5. Install dependencies  
+   pip install -r requirements.txt
 
-3. Install dependencies
-pip install -r requirements.txt
+6. Start the server  
+   uvicorn app.main:app --reload
 
-4. Start the server
-uvicorn app.main:app --reload
+7. Open API documentation  
+   http://127.0.0.1:8000/docs
 
+---
 
-Swagger UI:
+## Authentication Flow
 
-http://127.0.0.1:8000/docs
+1. Register  
+   POST /auth/register
 
-🔐 Authentication Flow
+2. Login  
+   POST /auth/login
 
-Register
+3. Copy the access token returned
 
-POST /auth/register
+4. In Swagger UI, click Authorize and enter  
+   Bearer <your_token>
 
+---
 
-Login
+## Running Tests
 
-POST /auth/login
-
-
-Copy the returned access token
-
-In Swagger UI, click Authorize and enter:
-
-Bearer <your_token>
-
-🧪 Running Tests
+Run the test suite with  
 pytest -q
 
+Tests use an isolated database and do not affect production data.
 
-Uses an isolated SQLite test database
+---
 
-Does not affect production data
-
-📌 Why This Project
+## Why This Project
 
 This project was built to demonstrate:
 
-Secure authentication and authorization
+- Secure authentication and authorization
+- REST API best practices
+- Clean separation of concerns
+- Automated testing
+- Production-style backend architecture
 
-REST API design best practices
+This repository is intended as a portfolio and interview-ready backend project.
 
-Clean separation of concerns
+---
 
-Automated testing with pytest
+## Contact
 
-Production-ready backend structure
-
-Designed as a portfolio-ready backend project.
-
-📬 Contact
-
-Darwish Chahbar
-📧 chahbar.darwish@gmail.com
-
-🔗 https://github.com/DChahbar
+Darwish Chahbar  
+Email: chahbar.darwish@gmail.com  
+GitHub: https://github.com/DChahbar
