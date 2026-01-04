@@ -1,20 +1,21 @@
 # tests/conftest.py
-import os
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.db import Base
 from app.deps import get_db
 from app.main import app
 
-TEST_DB_URL = "sqlite:///./test_task_management.db"
-
+# In-memory SQLite, shared across the whole test session (NO file locks on Windows)
 engine = create_engine(
-    TEST_DB_URL,
+    "sqlite://",
     connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
 )
+
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -28,13 +29,9 @@ def override_get_db():
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_db():
-    # Create tables
     Base.metadata.create_all(bind=engine)
     yield
-    # Drop tables and remove db file
     Base.metadata.drop_all(bind=engine)
-    if os.path.exists("./test_task_management.db"):
-        os.remove("./test_task_management.db")
 
 
 @pytest.fixture()
