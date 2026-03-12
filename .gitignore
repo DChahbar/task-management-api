@@ -1,0 +1,22 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment files
+.env
+
+# Database files
+*.db
+
+# Coverage
+.coverage
+htmlcov/
+
+# OS/editor junk
+.DS_Store
+.vscode/
+.idea/
