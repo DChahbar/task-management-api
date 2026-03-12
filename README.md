@@ -1,5 +1,7 @@
 # Task Management API
 
+![CI](https://github.com/DChahbar/task-management-api/actions/workflows/ci.yml/badge.svg)
+
 A production-style Task Management REST API built with FastAPI, SQLAlchemy, and JWT authentication.
 
 This project demonstrates real backend engineering patterns including authentication, authorization, testing, and clean architecture.
@@ -22,6 +24,7 @@ This project demonstrates real backend engineering patterns including authentica
 - Python 3.12
 - FastAPI
 - SQLAlchemy
+- Alembic (database migrations)
 - SQLite
 - Pydantic
 - Pytest
@@ -67,10 +70,13 @@ task-management-api/
 5. Install dependencies  
    pip install -r requirements.txt
 
-6. Start the server  
+6. Run database migrations  
+   alembic upgrade head
+   
+7. Start the server  
    uvicorn app.main:app --reload
 
-7. Open API documentation  
+8. Open API documentation  
    http://127.0.0.1:8000/docs
 
 ---
@@ -118,3 +124,4 @@ This repository is intended as a portfolio and interview-ready backend project.
 Darwish Chahbar  
 Email: chahbar.darwish@gmail.com  
 GitHub: https://github.com/DChahbar
+
