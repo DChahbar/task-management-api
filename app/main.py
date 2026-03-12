@@ -3,15 +3,11 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from .db import Base, engine
 from . import models, schemas, crud
 from .deps import get_db, get_current_user
 from .auth import create_access_token
 
 app = FastAPI(title="Task Management API")
-
-# Ensure tables exist
-Base.metadata.create_all(bind=engine)
 
 
 @app.get("/health")
