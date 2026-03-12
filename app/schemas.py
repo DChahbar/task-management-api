@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
 # =====================
@@ -11,13 +11,14 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, max_length=128)
 
 
 class UserOut(BaseModel):
     id: int
     email: EmailStr
     created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,13 +37,13 @@ class Token(BaseModel):
 # =====================
 
 class TaskCreate(BaseModel):
-    title: str
-    description: Optional[str] = None
+    title: str = Field(..., min_length=1, max_length=200)
+    description: Optional[str] = Field(default=None, max_length=2000)
 
 
 class TaskUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
+    title: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    description: Optional[str] = Field(default=None, max_length=2000)
     completed: Optional[bool] = None
 
 
@@ -52,5 +53,6 @@ class TaskOut(BaseModel):
     description: Optional[str]
     completed: bool
     created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
