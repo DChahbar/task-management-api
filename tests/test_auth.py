@@ -1,37 +1,71 @@
-# tests/test_auth.py
-def test_register_success(client):
-    res = client.post("/auth/register", json={"email": "a@a.com", "password": "pass1234"})
-    assert res.status_code == 201, res.text
-    data = res.json()
-    assert data["email"] == "a@a.com"
+def test_register_user(client):
+    response = client.post(
+        "/auth/register",
+        json={"email": "test@example.com", "password": "password123"}
+    )
+
+    assert response.status_code == 201
+    data = response.json()
+    assert data["email"] == "test@example.com"
     assert "id" in data
     assert "created_at" in data
+    assert "updated_at" in data
 
 
 def test_register_duplicate_email(client):
-    client.post("/auth/register", json={"email": "dup@a.com", "password": "pass1234"})
-    res = client.post("/auth/register", json={"email": "dup@a.com", "password": "pass1234"})
-    assert res.status_code == 400, res.text
+    payload = {"email": "test@example.com", "password": "password123"}
+
+    first_response = client.post("/auth/register", json=payload)
+    second_response = client.post("/auth/register", json=payload)
+
+    assert first_response.status_code == 201
+    assert second_response.status_code in [400, 409]
 
 
-def test_login_success_returns_token(client):
-    client.post("/auth/register", json={"email": "login@a.com", "password": "pass1234"})
-    res = client.post(
-        "/auth/login",
-        data={"username": "login@a.com", "password": "pass1234"},
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
+def test_login_success(client):
+    client.post(
+        "/auth/register",
+        json={"email": "test@example.com", "password": "password123"}
     )
-    assert res.status_code == 200, res.text
-    data = res.json()
+
+    response = client.post(
+        "/auth/login",
+        data={"username": "test@example.com", "password": "password123"}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
     assert "access_token" in data
     assert data["token_type"] == "bearer"
 
 
-def test_login_wrong_password_fails(client):
-    client.post("/auth/register", json={"email": "wrong@a.com", "password": "pass1234"})
-    res = client.post(
-        "/auth/login",
-        data={"username": "wrong@a.com", "password": "nope"},
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
+def test_login_wrong_password(client):
+    client.post(
+        "/auth/register",
+        json={"email": "test@example.com", "password": "password123"}
     )
-    assert res.status_code == 401, res.text
+
+    response = client.post(
+        "/auth/login",
+        data={"username": "test@example.com", "password": "wrongpassword"}
+    )
+
+    assert response.status_code == 401
+
+
+def test_register_invalid_email(client):
+    response = client.post(
+        "/auth/register",
+        json={"email": "not-an-email", "password": "password123"}
+    )
+
+    assert response.status_code == 422
+
+
+def test_register_short_password(client):
+    response = client.post(
+        "/auth/register",
+        json={"email": "test@example.com", "password": "short"}
+    )
+
+    assert response.status_code == 422

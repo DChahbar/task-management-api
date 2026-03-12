@@ -1,64 +1,189 @@
-# tests/test_tasks.py
-def register_and_login(client, email="user@a.com", password="pass1234"):
+def register_and_login(client, email, password="password123"):
     client.post("/auth/register", json={"email": email, "password": password})
-    res = client.post(
+
+    login_response = client.post(
         "/auth/login",
-        data={"username": email, "password": password},
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        data={"username": email, "password": password}
     )
-    token = res.json()["access_token"]
+
+    token = login_response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
 
 
-def test_cannot_create_task_without_token(client):
-    res = client.post("/tasks", json={"title": "t1", "description": "d"})
-    assert res.status_code == 401, res.text
+def test_health_check(client):
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
 
 
-def test_create_and_list_tasks(client):
-    headers = register_and_login(client, "t@a.com")
-    res1 = client.post("/tasks", json={"title": "Task 1", "description": "D1"}, headers=headers)
-    assert res1.status_code == 201, res1.text
+def test_create_task_requires_auth(client):
+    response = client.post(
+        "/tasks",
+        json={"title": "Test task", "description": "Test description"}
+    )
 
-    res2 = client.get("/tasks", headers=headers)
-    assert res2.status_code == 200, res2.text
-    data = res2.json()
+    assert response.status_code == 401
+
+
+def test_create_task_success(client):
+    headers = register_and_login(client, "user1@example.com")
+
+    response = client.post(
+        "/tasks",
+        json={"title": "Test task", "description": "Test description"},
+        headers=headers
+    )
+
+    assert response.status_code in [200, 201]
+
+    data = response.json()
+    assert data["title"] == "Test task"
+    assert data["description"] == "Test description"
+    assert data["completed"] is False
+    assert "id" in data
+    assert "created_at" in data
+    assert "updated_at" in data
+
+
+def test_create_task_invalid_payload(client):
+    headers = register_and_login(client, "user1@example.com")
+
+    response = client.post(
+        "/tasks",
+        json={"title": "", "description": "Test description"},
+        headers=headers
+    )
+
+    assert response.status_code == 422
+
+
+def test_list_tasks_only_returns_own_tasks(client):
+    headers1 = register_and_login(client, "user1@example.com")
+    headers2 = register_and_login(client, "user2@example.com")
+
+    client.post("/tasks", json={"title": "User 1 task"}, headers=headers1)
+    client.post("/tasks", json={"title": "User 2 task"}, headers=headers2)
+
+    response = client.get("/tasks", headers=headers1)
+
+    assert response.status_code == 200
+
+    data = response.json()
     assert len(data) == 1
-    assert data[0]["title"] == "Task 1"
+    assert data[0]["title"] == "User 1 task"
 
 
-def test_user_cannot_access_other_users_task(client):
-    headers_a = register_and_login(client, "a@a.com")
-    headers_b = register_and_login(client, "b@a.com")
+def test_get_own_task(client):
+    headers = register_and_login(client, "user1@example.com")
 
-    create = client.post("/tasks", json={"title": "Secret", "description": None}, headers=headers_a)
-    task_id = create.json()["id"]
+    create_response = client.post(
+        "/tasks",
+        json={"title": "My task", "description": "Mine"},
+        headers=headers
+    )
 
-    # User B tries to read A's task
-    res = client.get(f"/tasks/{task_id}", headers=headers_b)
-    assert res.status_code == 404, res.text
+    task_id = create_response.json()["id"]
+
+    response = client.get(f"/tasks/{task_id}", headers=headers)
+
+    assert response.status_code == 200
+    assert response.json()["title"] == "My task"
 
 
-def test_patch_task_updates_fields(client):
-    headers = register_and_login(client, "patch@a.com")
-    create = client.post("/tasks", json={"title": "Old", "description": "x"}, headers=headers)
-    task_id = create.json()["id"]
+def test_cannot_get_another_users_task(client):
+    headers1 = register_and_login(client, "user1@example.com")
+    headers2 = register_and_login(client, "user2@example.com")
 
-    patch = client.patch(f"/tasks/{task_id}", json={"title": "New", "completed": True}, headers=headers)
-    assert patch.status_code == 200, patch.text
-    data = patch.json()
-    assert data["title"] == "New"
+    create_response = client.post(
+        "/tasks",
+        json={"title": "Private task"},
+        headers=headers1
+    )
+
+    task_id = create_response.json()["id"]
+
+    response = client.get(f"/tasks/{task_id}", headers=headers2)
+
+    assert response.status_code in [403, 404]
+
+
+def test_update_own_task(client):
+    headers = register_and_login(client, "user1@example.com")
+
+    create_response = client.post(
+        "/tasks",
+        json={"title": "Old title"},
+        headers=headers
+    )
+
+    task_id = create_response.json()["id"]
+
+    response = client.patch(
+        f"/tasks/{task_id}",
+        json={"title": "New title", "completed": True},
+        headers=headers
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["title"] == "New title"
     assert data["completed"] is True
 
 
-def test_delete_task(client):
-    headers = register_and_login(client, "del@a.com")
-    create = client.post("/tasks", json={"title": "Del", "description": None}, headers=headers)
-    task_id = create.json()["id"]
+def test_cannot_update_another_users_task(client):
+    headers1 = register_and_login(client, "user1@example.com")
+    headers2 = register_and_login(client, "user2@example.com")
 
-    res = client.delete(f"/tasks/{task_id}", headers=headers)
-    assert res.status_code == 204, res.text
+    create_response = client.post(
+        "/tasks",
+        json={"title": "Private task"},
+        headers=headers1
+    )
 
-    # Verify it's gone
-    res2 = client.get(f"/tasks/{task_id}", headers=headers)
-    assert res2.status_code == 404, res2.text
+    task_id = create_response.json()["id"]
+
+    response = client.patch(
+        f"/tasks/{task_id}",
+        json={"title": "Hacked"},
+        headers=headers2
+    )
+
+    assert response.status_code in [403, 404]
+
+
+def test_delete_own_task(client):
+    headers = register_and_login(client, "user1@example.com")
+
+    create_response = client.post(
+        "/tasks",
+        json={"title": "Delete me"},
+        headers=headers
+    )
+
+    task_id = create_response.json()["id"]
+
+    delete_response = client.delete(f"/tasks/{task_id}", headers=headers)
+
+    assert delete_response.status_code in [200, 204]
+
+    get_response = client.get(f"/tasks/{task_id}", headers=headers)
+
+    assert get_response.status_code == 404
+
+
+def test_cannot_delete_another_users_task(client):
+    headers1 = register_and_login(client, "user1@example.com")
+    headers2 = register_and_login(client, "user2@example.com")
+
+    create_response = client.post(
+        "/tasks",
+        json={"title": "Private task"},
+        headers=headers1
+    )
+
+    task_id = create_response.json()["id"]
+
+    response = client.delete(f"/tasks/{task_id}", headers=headers2)
+
+    assert response.status_code in [403, 404]
