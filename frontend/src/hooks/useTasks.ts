@@ -22,9 +22,27 @@ export function useTasks() {
     }
   }, [])
 
+  const replaceTask = useCallback((updated: Task) => {
+    setTasks((current) =>
+      current.map((task) => (task.id === updated.id ? updated : task)),
+    )
+  }, [])
+
+  const removeTask = useCallback((taskId: number) => {
+    setTasks((current) => current.filter((task) => task.id !== taskId))
+  }, [])
+
   useEffect(() => {
     void refetch()
   }, [refetch])
 
-  return { tasks, isLoading, error, refetch }
+  return {
+    tasks,
+    setTasks,
+    isLoading,
+    error,
+    refetch,
+    replaceTask,
+    removeTask,
+  }
 }

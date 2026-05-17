@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { deleteTask } from '../api/tasks'
+import { deleteTask, updateTask } from '../api/tasks'
 import { TaskFilters } from '../components/tasks/TaskFilters'
 import { TaskList } from '../components/tasks/TaskList'
 import { TaskSearchBar } from '../components/tasks/TaskSearchBar'
@@ -10,6 +10,7 @@ import { FormAlert } from '../components/ui/FormAlert'
 import { LoadingState } from '../components/ui/LoadingState'
 import { PageHeading } from '../components/ui/PageHeading'
 import { useTasks } from '../hooks/useTasks'
+import type { Task } from '../types/api'
 import { getApiErrorMessage } from '../utils/errors'
 import {
   countTasksByStatus,
@@ -18,9 +19,11 @@ import {
 } from '../utils/tasks'
 
 export function DashboardPage() {
-  const { tasks, isLoading, error, refetch } = useTasks()
+  const { tasks, setTasks, isLoading, error, refetch, replaceTask, removeTask } =
+    useTasks()
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [togglingId, setTogglingId] = useState<number | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
@@ -40,18 +43,49 @@ export function DashboardPage() {
     [tasks.length, stats.active, stats.completed],
   )
 
+  async function handleToggleComplete(task: Task) {
+    const nextCompleted = !task.completed
+    setActionError(null)
+    setTogglingId(task.id)
+
+    const optimistic: Task = {
+      ...task,
+      completed: nextCompleted,
+      updated_at: new Date().toISOString(),
+    }
+    replaceTask(optimistic)
+
+    try {
+      const updated = await updateTask(task.id, { completed: nextCompleted })
+      replaceTask(updated)
+    } catch (err) {
+      replaceTask(task)
+      setActionError(
+        getApiErrorMessage(err, 'Failed to update task status.'),
+      )
+    } finally {
+      setTogglingId(null)
+    }
+  }
+
   async function handleDelete(taskId: number) {
-    if (!window.confirm('Delete this task? This cannot be undone.')) {
+    const task = tasks.find((item) => item.id === taskId)
+    if (!task) return
+
+    if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) {
       return
     }
 
     setActionError(null)
     setDeletingId(taskId)
 
+    const snapshot = tasks
+    removeTask(taskId)
+
     try {
       await deleteTask(taskId)
-      await refetch()
     } catch (err) {
+      setTasks(snapshot)
       setActionError(getApiErrorMessage(err, 'Failed to delete task.'))
     } finally {
       setDeletingId(null)
@@ -132,7 +166,9 @@ export function DashboardPage() {
           {hasFilteredResults ? (
             <TaskList
               tasks={filteredTasks}
+              onToggleComplete={handleToggleComplete}
               onDelete={handleDelete}
+              togglingId={togglingId}
               deletingId={deletingId}
             />
           ) : (
