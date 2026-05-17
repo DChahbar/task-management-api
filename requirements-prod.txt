@@ -1,0 +1,10 @@
+alembic==1.18.4
+email-validator==2.3.0
+fastapi==0.128.0
+pydantic==2.12.5
+pydantic-settings==2.13.1
+python-jose==3.5.0
+python-multipart==0.0.21
+SQLAlchemy==2.0.45
+uvicorn==0.40.0
+passlib==1.7.4
