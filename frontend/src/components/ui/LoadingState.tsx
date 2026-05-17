@@ -1,3 +1,5 @@
+import { LoadingSpinner } from './LoadingSpinner'
+
 interface LoadingStateProps {
   label?: string
 }
@@ -5,11 +7,12 @@ interface LoadingStateProps {
 export function LoadingState({ label = 'Loading…' }: LoadingStateProps) {
   return (
     <div
-      className="flex min-h-[12rem] items-center justify-center"
+      className="flex min-h-[12rem] flex-col items-center justify-center gap-3"
       role="status"
       aria-live="polite"
     >
-      <p className="text-slate-600 dark:text-slate-400">{label}</p>
+      <LoadingSpinner className="h-8 w-8 text-blue-600 dark:text-blue-400" label={label} />
+      <p className="text-sm text-slate-600 dark:text-slate-400">{label}</p>
     </div>
   )
 }

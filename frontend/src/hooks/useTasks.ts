@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { listTasks } from '../api/tasks'
 import type { Task } from '../types/api'
 import { getApiErrorMessage } from '../utils/errors'
@@ -6,19 +6,38 @@ import { getApiErrorMessage } from '../utils/errors'
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isRefetching, setIsRefetching] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const hasLoadedRef = useRef(false)
 
   const refetch = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
+    const isSubsequentLoad = hasLoadedRef.current
+
+    if (isSubsequentLoad) {
+      setIsRefetching(true)
+      setFetchError(null)
+    } else {
+      setIsLoading(true)
+      setError(null)
+    }
 
     try {
       const data = await listTasks()
       setTasks(data)
+      hasLoadedRef.current = true
+      setError(null)
+      setFetchError(null)
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Failed to load tasks.'))
+      const message = getApiErrorMessage(err, 'Failed to load tasks.')
+      if (isSubsequentLoad) {
+        setFetchError(message)
+      } else {
+        setError(message)
+      }
     } finally {
       setIsLoading(false)
+      setIsRefetching(false)
     }
   }, [])
 
@@ -40,7 +59,10 @@ export function useTasks() {
     tasks,
     setTasks,
     isLoading,
+    isRefetching,
     error,
+    fetchError,
+    clearFetchError: () => setFetchError(null),
     refetch,
     replaceTask,
     removeTask,

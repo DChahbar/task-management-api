@@ -1,19 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
+import { LoadingState } from '../components/ui/LoadingState'
 import { useAuth } from '../hooks/useAuth'
 
 export function GuestOnlyRoute() {
   const { isAuthenticated, isLoading } = useAuth()
 
   if (isLoading) {
-    return (
-      <div
-        className="flex min-h-[50vh] items-center justify-center"
-        role="status"
-        aria-live="polite"
-      >
-        <p className="text-slate-600 dark:text-slate-400">Loading…</p>
-      </div>
-    )
+    return <LoadingState label="Checking session..." />
   }
 
   if (isAuthenticated) {

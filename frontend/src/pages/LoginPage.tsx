@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FormAlert } from '../components/ui/FormAlert'
+import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { PageHeading } from '../components/ui/PageHeading'
 import { useAuth } from '../hooks/useAuth'
 import { getApiErrorMessage } from '../utils/errors'
@@ -44,7 +45,9 @@ export function LoginPage() {
         description="Sign in to manage your tasks."
       />
 
-      {error && <FormAlert message={error} />}
+      {error && (
+        <FormAlert message={error} onDismiss={() => setError(null)} />
+      )}
 
       <form
         className="mt-4 space-y-4"
@@ -94,7 +97,14 @@ export function LoginPage() {
           disabled={isSubmitting}
           className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-400"
         >
-          {isSubmitting ? 'Logging in…' : 'Log in'}
+          {isSubmitting ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <LoadingSpinner className="h-4 w-4" label="Logging in" />
+              Logging in...
+            </span>
+          ) : (
+            'Log in'
+          )}
         </button>
       </form>
 

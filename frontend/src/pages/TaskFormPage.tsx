@@ -1,10 +1,12 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { createTask, deleteTask, updateTask } from '../api/tasks'
+import { TaskFormSkeleton } from '../components/tasks/TaskFormSkeleton'
 import { FormAlert } from '../components/ui/FormAlert'
+import { ErrorState } from '../components/ui/ErrorState'
 import { FieldHint } from '../components/ui/FieldHint'
 import { inputClassName } from '../components/ui/inputStyles'
-import { LoadingState } from '../components/ui/LoadingState'
+import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { PageHeading } from '../components/ui/PageHeading'
 import { useTask } from '../hooks/useTask'
 import { getApiErrorMessage } from '../utils/errors'
@@ -22,7 +24,8 @@ export function TaskFormPage() {
       : undefined
   const isInvalidId = isEditing && taskId === undefined
 
-  const { task, isLoading, error: loadError } = useTask(taskId)
+  const { task, isLoading, isRetrying, error: loadError, refetch } =
+    useTask(taskId)
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -106,14 +109,24 @@ export function TaskFormPage() {
   const isBusy = isSubmitting || isDeleting
 
   if (isEditing && isLoading) {
-    return <LoadingState label="Loading task…" />
+    return (
+      <>
+        <PageHeading title="Edit task" description="Loading task details..." />
+        <TaskFormSkeleton />
+      </>
+    )
   }
 
   if (isEditing && loadError) {
     return (
       <div className="space-y-4">
         <PageHeading title="Edit task" />
-        <FormAlert message={loadError} />
+        <ErrorState
+          title="Could not load task"
+          message={loadError}
+          onRetry={() => void refetch()}
+          isRetrying={isRetrying}
+        />
         <Link
           to="/dashboard"
           className="inline-flex text-sm font-medium text-blue-600 no-underline hover:text-blue-700 dark:text-blue-400"
@@ -149,7 +162,10 @@ export function TaskFormPage() {
 
       {submitError && (
         <div className="mb-4">
-          <FormAlert message={submitError} />
+          <FormAlert
+            message={submitError}
+            onDismiss={() => setSubmitError(null)}
+          />
         </div>
       )}
 
@@ -238,11 +254,16 @@ export function TaskFormPage() {
               disabled={isBusy}
               className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-400"
             >
-              {isSubmitting
-                ? 'Saving...'
-                : isEditing
-                  ? 'Save changes'
-                  : 'Create task'}
+              {isSubmitting ? (
+                <span className="inline-flex items-center justify-center gap-2">
+                  <LoadingSpinner className="h-4 w-4" label="Saving" />
+                  Saving...
+                </span>
+              ) : isEditing ? (
+                'Save changes'
+              ) : (
+                'Create task'
+              )}
             </button>
           </div>
 
@@ -253,7 +274,14 @@ export function TaskFormPage() {
               disabled={isBusy}
               className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/50"
             >
-              {isDeleting ? 'Deleting...' : 'Delete task'}
+              {isDeleting ? (
+                <span className="inline-flex items-center justify-center gap-2">
+                  <LoadingSpinner className="h-4 w-4" label="Deleting" />
+                  Deleting...
+                </span>
+              ) : (
+                'Delete task'
+              )}
             </button>
           )}
         </div>

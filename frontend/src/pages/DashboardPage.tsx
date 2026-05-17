@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom'
 import { deleteTask, updateTask } from '../api/tasks'
 import { TaskFilters } from '../components/tasks/TaskFilters'
 import { TaskList } from '../components/tasks/TaskList'
+import { TaskListSkeleton } from '../components/tasks/TaskListSkeleton'
 import { TaskSearchBar } from '../components/tasks/TaskSearchBar'
 import { TaskStats } from '../components/tasks/TaskStats'
+import { TaskStatsSkeleton } from '../components/tasks/TaskStatsSkeleton'
+import { Alert } from '../components/ui/Alert'
 import { EmptyState } from '../components/ui/EmptyState'
-import { FormAlert } from '../components/ui/FormAlert'
-import { LoadingState } from '../components/ui/LoadingState'
+import { ErrorState } from '../components/ui/ErrorState'
 import { PageHeading } from '../components/ui/PageHeading'
 import { useTasks } from '../hooks/useTasks'
 import type { Task } from '../types/api'
@@ -19,8 +21,18 @@ import {
 } from '../utils/tasks'
 
 export function DashboardPage() {
-  const { tasks, setTasks, isLoading, error, refetch, replaceTask, removeTask } =
-    useTasks()
+  const {
+    tasks,
+    setTasks,
+    isLoading,
+    isRefetching,
+    error,
+    fetchError,
+    clearFetchError,
+    refetch,
+    replaceTask,
+    removeTask,
+  } = useTasks()
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [togglingId, setTogglingId] = useState<number | null>(null)
@@ -94,6 +106,7 @@ export function DashboardPage() {
 
   const hasTasks = tasks.length > 0
   const hasFilteredResults = filteredTasks.length > 0
+  const showInitialSkeleton = isLoading && !hasTasks && !error
 
   return (
     <>
@@ -112,24 +125,47 @@ export function DashboardPage() {
 
       {actionError && (
         <div className="mb-4">
-          <FormAlert message={actionError} />
+          <Alert
+            variant="error"
+            message={actionError}
+            onDismiss={() => setActionError(null)}
+          />
         </div>
       )}
 
-      {error && (
-        <div className="mb-6 space-y-3">
-          <FormAlert message={error} />
-          <button
-            type="button"
-            onClick={() => void refetch()}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            Try again
-          </button>
+      {fetchError && (
+        <div className="mb-4">
+          <Alert
+            variant="error"
+            message={fetchError}
+            onDismiss={clearFetchError}
+          />
         </div>
       )}
 
-      {isLoading && <LoadingState label="Loading tasks…" />}
+      {isRefetching && hasTasks && !fetchError && (
+        <div className="mb-4">
+          <Alert variant="info" message="Refreshing tasks..." />
+        </div>
+      )}
+
+      {showInitialSkeleton && (
+        <div className="space-y-6">
+          <TaskStatsSkeleton />
+          <TaskListSkeleton count={4} />
+        </div>
+      )}
+
+      {error && !hasTasks && (
+        <div className="mb-6">
+          <ErrorState
+            title="Could not load tasks"
+            message={error}
+            onRetry={() => void refetch()}
+            isRetrying={isRefetching}
+          />
+        </div>
+      )}
 
       {!isLoading && !error && !hasTasks && (
         <EmptyState
@@ -147,7 +183,12 @@ export function DashboardPage() {
       )}
 
       {!isLoading && !error && hasTasks && (
-        <div className="space-y-6">
+        <div
+          className={[
+            'space-y-6',
+            isRefetching ? 'pointer-events-none opacity-60' : '',
+          ].join(' ')}
+        >
           <TaskStats
             total={stats.total}
             active={stats.active}
