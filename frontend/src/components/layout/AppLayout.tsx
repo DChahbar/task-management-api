@@ -5,20 +5,20 @@ import { PageContainer } from './PageContainer'
 
 interface AppLayoutProps {
   children: ReactNode
-  showNav?: boolean
+  headerVariant?: 'guest' | 'app'
   narrow?: boolean
   className?: string
 }
 
 export function AppLayout({
   children,
-  showNav = false,
+  headerVariant = 'guest',
   narrow = false,
   className,
 }: AppLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <Header showNav={showNav} />
+      <Header variant={headerVariant} />
       <main id="main-content" className="flex-1">
         <PageContainer narrow={narrow} className={className}>
           {children}

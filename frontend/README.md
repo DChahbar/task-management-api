@@ -13,6 +13,17 @@ npm run dev
 
 Dev server: http://localhost:5173
 
+## Routes
+
+| Path | Page |
+|------|------|
+| `/` | Home |
+| `/login` | Login |
+| `/register` | Register |
+| `/dashboard` | Dashboard |
+| `/tasks/new` | Create task |
+| `/tasks/:taskId/edit` | Edit task |
+
 ## Scripts
 
 - `npm run dev` — start development server
