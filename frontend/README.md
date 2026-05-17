@@ -1,6 +1,6 @@
 # Task Management Frontend
 
-React + TypeScript + Vite client for the Task Management API.
+React + TypeScript + Vite + Tailwind CSS client for the Task Management API.
 
 ## Setup
 
