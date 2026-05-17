@@ -211,6 +211,12 @@ This project demonstrates skills employers look for in full-stack and backend ro
 
 ---
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
 ## Contact
 
 **Darwish Chahbar**  

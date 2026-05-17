@@ -1,7 +1,8 @@
 {
   "name": "task-management-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "React frontend for the Task Management full-stack application",
   "type": "module",
   "scripts": {
     "dev": "vite",

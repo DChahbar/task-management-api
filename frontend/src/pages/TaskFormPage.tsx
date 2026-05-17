@@ -9,6 +9,7 @@ import { inputClassName } from '../components/ui/inputStyles'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { PageHeading } from '../components/ui/PageHeading'
 import { useTask } from '../hooks/useTask'
+import { btnPrimary, btnSecondary, linkMuted } from '../styles/ui'
 import { getApiErrorMessage } from '../utils/errors'
 
 const TITLE_MAX = 200
@@ -130,7 +131,7 @@ export function TaskFormPage() {
         />
         <Link
           to="/dashboard"
-          className="inline-flex text-sm font-medium text-blue-600 no-underline hover:text-blue-700 dark:text-blue-400"
+          className={linkMuted}
         >
           Back to dashboard
         </Link>
@@ -144,7 +145,7 @@ export function TaskFormPage() {
         <PageHeading title="Invalid task" description="This task link is not valid." />
         <Link
           to="/dashboard"
-          className="inline-flex text-sm font-medium text-blue-600 no-underline hover:text-blue-700 dark:text-blue-400"
+          className={linkMuted}
         >
           Back to dashboard
         </Link>
@@ -249,15 +250,11 @@ export function TaskFormPage() {
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Link
               to="/dashboard"
-              className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-center text-sm font-medium text-slate-700 no-underline hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              disabled={isBusy}
-              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-400"
-            >
+            className={`${btnSecondary} text-center`}
+          >
+            Cancel
+          </Link>
+          <button type="submit" disabled={isBusy} className={btnPrimary}>
               {isSubmitting ? (
                 <span className="inline-flex items-center justify-center gap-2">
                   <LoadingSpinner className="h-4 w-4" label="Saving" />

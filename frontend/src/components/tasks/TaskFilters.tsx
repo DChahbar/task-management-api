@@ -1,4 +1,5 @@
 import { type KeyboardEvent, useRef } from 'react'
+import { focusRing } from '../../styles/ui'
 import type { TaskFilter } from '../../utils/tasks'
 
 interface TaskFiltersProps {
@@ -13,9 +14,6 @@ const filters: { value: TaskFilter; label: string }[] = [
   { value: 'active', label: 'Active' },
   { value: 'completed', label: 'Completed' },
 ]
-
-const focusRing =
-  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:focus-visible:outline-blue-400'
 
 export function TaskFilters({
   filter,
@@ -86,6 +84,7 @@ export function TaskFilters({
             tabIndex={isActive ? 0 : -1}
             onClick={() => onFilterChange(item.value)}
             onKeyDown={(event) => handleKeyDown(event, index)}
+            aria-label={`${item.label}, ${count} tasks`}
             className={[
               'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
               focusRing,
@@ -102,9 +101,9 @@ export function TaskFilters({
                   ? 'bg-blue-500 text-white dark:bg-blue-400'
                   : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
               ].join(' ')}
-              aria-label={`${count} tasks`}
+              aria-hidden="true"
             >
-              <span aria-hidden="true">{count}</span>
+              {count}
             </span>
           </button>
         )

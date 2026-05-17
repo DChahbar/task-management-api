@@ -13,6 +13,7 @@ import { ErrorState } from '../components/ui/ErrorState'
 import { PageHeading } from '../components/ui/PageHeading'
 import { useTasks } from '../hooks/useTasks'
 import type { Task } from '../types/api'
+import { btnPrimary, btnSecondary } from '../styles/ui'
 import { getApiErrorMessage } from '../utils/errors'
 import {
   countTasksByStatus,
@@ -115,11 +116,9 @@ export function DashboardPage() {
           titleId="dashboard-title"
           title="Dashboard"
           description="View, filter, and manage your tasks."
+          className="mb-0 sm:mb-0"
         />
-        <Link
-          to="/tasks/new"
-          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white no-underline hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:bg-blue-500 dark:hover:bg-blue-400 dark:focus-visible:outline-blue-400"
-        >
+        <Link to="/tasks/new" className={`${btnPrimary} shrink-0`}>
           New task
         </Link>
       </div>
@@ -173,10 +172,7 @@ export function DashboardPage() {
           title="No tasks yet"
           description="Create your first task to get started organizing your work."
           action={
-            <Link
-              to="/tasks/new"
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white no-underline hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
-            >
+            <Link to="/tasks/new" className={btnPrimary}>
               Create task
             </Link>
           }
@@ -225,7 +221,7 @@ export function DashboardPage() {
                     setFilter('all')
                     setSearchQuery('')
                   }}
-                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                  className={btnSecondary}
                 >
                   Clear filters
                 </button>

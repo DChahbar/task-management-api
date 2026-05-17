@@ -9,7 +9,20 @@ from .config import settings
 from .deps import get_db, get_current_user
 from .auth import create_access_token
 
-app = FastAPI(title="Task Management API")
+app = FastAPI(
+    title="Task Management API",
+    description="REST API for the Task Management full-stack application.",
+    version="1.0.0",
+)
+
+
+@app.get("/")
+def root():
+    return {
+        "name": "Task Management API",
+        "docs": "/docs",
+        "health": "/health",
+    }
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,12 +1,12 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { focusRing } from '../../styles/ui'
 
 interface HeaderProps {
   variant?: 'guest' | 'app'
 }
 
-const linkFocusClass =
-  'rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:focus-visible:outline-blue-400'
+const linkFocusClass = `rounded ${focusRing}`
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   [

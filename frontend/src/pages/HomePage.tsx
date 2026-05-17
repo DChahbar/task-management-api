@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { btnPrimary, btnSecondary } from '../styles/ui'
 
 export function HomePage() {
   const { isAuthenticated } = useAuth()
@@ -17,24 +18,15 @@ export function HomePage() {
       </p>
       <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
         {isAuthenticated ? (
-          <Link
-            to="/dashboard"
-            className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white no-underline hover:bg-blue-700 sm:w-auto dark:bg-blue-500 dark:hover:bg-blue-400"
-          >
+          <Link to="/dashboard" className={`${btnPrimary} w-full sm:w-auto`}>
             Go to dashboard
           </Link>
         ) : (
           <>
-            <Link
-              to="/register"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white no-underline hover:bg-blue-700 sm:w-auto dark:bg-blue-500 dark:hover:bg-blue-400"
-            >
+            <Link to="/register" className={`${btnPrimary} w-full sm:w-auto`}>
               Get started
             </Link>
-            <Link
-              to="/login"
-              className="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 no-underline hover:bg-slate-50 sm:w-auto dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-            >
+            <Link to="/login" className={`${btnSecondary} w-full sm:w-auto`}>
               Log in
             </Link>
           </>

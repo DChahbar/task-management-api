@@ -1,3 +1,11 @@
+def test_root(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == "Task Management API"
+    assert data["docs"] == "/docs"
+
+
 def test_register_user(client):
     response = client.post(
         "/auth/register",

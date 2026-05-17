@@ -4,9 +4,8 @@ import { FormAlert } from '../components/ui/FormAlert'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { PageHeading } from '../components/ui/PageHeading'
 import { useAuth } from '../hooks/useAuth'
-import { getApiErrorMessage } from '../utils/errors'
-
 import { inputClassName } from '../components/ui/inputStyles'
+import { getApiErrorMessage } from '../utils/errors'
 
 const LOGIN_ERROR_ID = 'login-error'
 
