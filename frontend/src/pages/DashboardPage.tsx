@@ -1,17 +1,44 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { deleteTask } from '../api/tasks'
+import { TaskFilters } from '../components/tasks/TaskFilters'
 import { TaskList } from '../components/tasks/TaskList'
+import { TaskSearchBar } from '../components/tasks/TaskSearchBar'
+import { TaskStats } from '../components/tasks/TaskStats'
+import { EmptyState } from '../components/ui/EmptyState'
 import { FormAlert } from '../components/ui/FormAlert'
 import { LoadingState } from '../components/ui/LoadingState'
 import { PageHeading } from '../components/ui/PageHeading'
 import { useTasks } from '../hooks/useTasks'
 import { getApiErrorMessage } from '../utils/errors'
+import {
+  countTasksByStatus,
+  filterTasks,
+  type TaskFilter,
+} from '../utils/tasks'
 
 export function DashboardPage() {
   const { tasks, isLoading, error, refetch } = useTasks()
+  const [filter, setFilter] = useState<TaskFilter>('all')
+  const [searchQuery, setSearchQuery] = useState('')
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+
+  const stats = useMemo(() => countTasksByStatus(tasks), [tasks])
+
+  const filteredTasks = useMemo(
+    () => filterTasks(tasks, filter, searchQuery),
+    [tasks, filter, searchQuery],
+  )
+
+  const filterCounts = useMemo(
+    () => ({
+      all: tasks.length,
+      active: stats.active,
+      completed: stats.completed,
+    }),
+    [tasks.length, stats.active, stats.completed],
+  )
 
   async function handleDelete(taskId: number) {
     if (!window.confirm('Delete this task? This cannot be undone.')) {
@@ -31,12 +58,15 @@ export function DashboardPage() {
     }
   }
 
+  const hasTasks = tasks.length > 0
+  const hasFilteredResults = filteredTasks.length > 0
+
   return (
     <>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeading
           title="Dashboard"
-          description="View and manage your tasks."
+          description="View, filter, and manage your tasks."
         />
         <Link
           to="/tasks/new"
@@ -67,29 +97,65 @@ export function DashboardPage() {
 
       {isLoading && <LoadingState label="Loading tasks…" />}
 
-      {!isLoading && !error && tasks.length === 0 && (
-        <div
-          className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center dark:border-slate-700 dark:bg-slate-900"
-          role="status"
-        >
-          <p className="text-lg font-medium text-slate-900 dark:text-slate-50">
-            No tasks yet
-          </p>
-          <p className="mt-2 text-slate-600 dark:text-slate-400">
-            Create your first task to get started.
-          </p>
-          <Link
-            to="/tasks/new"
-            className="mt-6 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-          >
-            Create task
-          </Link>
-        </div>
+      {!isLoading && !error && !hasTasks && (
+        <EmptyState
+          title="No tasks yet"
+          description="Create your first task to get started organizing your work."
+          action={
+            <Link
+              to="/tasks/new"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white no-underline hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
+            >
+              Create task
+            </Link>
+          }
+        />
       )}
 
-      {!isLoading && !error && tasks.length > 0 && (
-        <TaskList tasks={tasks} onDelete={handleDelete} deletingId={deletingId} />
+      {!isLoading && !error && hasTasks && (
+        <div className="space-y-6">
+          <TaskStats
+            total={stats.total}
+            active={stats.active}
+            completed={stats.completed}
+          />
+
+          <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-900/50 sm:p-5">
+            <TaskSearchBar value={searchQuery} onChange={setSearchQuery} />
+            <TaskFilters
+              filter={filter}
+              onFilterChange={setFilter}
+              counts={filterCounts}
+            />
+          </div>
+
+          {hasFilteredResults ? (
+            <TaskList
+              tasks={filteredTasks}
+              onDelete={handleDelete}
+              deletingId={deletingId}
+            />
+          ) : (
+            <EmptyState
+              title="No matching tasks"
+              description="Try a different search term or filter to see more tasks."
+              action={
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilter('all')
+                    setSearchQuery('')
+                  }}
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  Clear filters
+                </button>
+              }
+            />
+          )}
+        </div>
       )}
     </>
   )
 }
+
