@@ -26,6 +26,8 @@ Dev server: http://localhost:5173
 | `/tasks/new` | Create task |
 | `/tasks/:taskId/edit` | Edit task |
 
+Task pages call `GET/POST/PATCH/DELETE /tasks` with the stored JWT.
+
 ## Scripts
 
 - `npm run dev` — start development server
