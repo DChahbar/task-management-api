@@ -11,6 +11,8 @@ cp .env.example .env
 npm run dev
 ```
 
+Start the API from the repo root (`uvicorn app.main:app --reload`) before signing in.
+
 Dev server: http://localhost:5173
 
 ## Routes

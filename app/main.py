@@ -1,13 +1,23 @@
 # app/main.py
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from . import models, schemas, crud
+from .config import settings
 from .deps import get_db, get_current_user
 from .auth import create_access_token
 
 app = FastAPI(title="Task Management API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")

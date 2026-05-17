@@ -1,4 +1,5 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
 
 interface HeaderProps {
   variant?: 'guest' | 'app'
@@ -13,17 +14,46 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   ].join(' ')
 
 export function Header({ variant = 'guest' }: HeaderProps) {
+  const { isAuthenticated, logout, user } = useAuth()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout()
+    navigate('/login')
+  }
+
   return (
     <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link
-          to={variant === 'app' ? '/dashboard' : '/'}
+          to={variant === 'app' || isAuthenticated ? '/dashboard' : '/'}
           className="text-lg font-semibold tracking-tight text-slate-900 no-underline hover:text-blue-600 dark:text-slate-50 dark:hover:text-blue-400"
         >
           Task Manager
         </Link>
 
-        {variant === 'guest' ? (
+        {variant === 'app' || isAuthenticated ? (
+          <nav aria-label="Main" className="flex items-center gap-4">
+            <NavLink to="/dashboard" className={navLinkClass}>
+              Dashboard
+            </NavLink>
+            <NavLink to="/tasks/new" className={navLinkClass}>
+              New task
+            </NavLink>
+            {user?.email && (
+              <span className="hidden text-sm text-slate-500 sm:inline dark:text-slate-400">
+                {user.email}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-50"
+            >
+              Log out
+            </button>
+          </nav>
+        ) : (
           <nav aria-label="Main" className="flex items-center gap-4">
             <NavLink to="/login" className={navLinkClass}>
               Log in
@@ -34,18 +64,6 @@ export function Header({ variant = 'guest' }: HeaderProps) {
             >
               Sign up
             </Link>
-          </nav>
-        ) : (
-          <nav aria-label="Main" className="flex items-center gap-4">
-            <NavLink to="/dashboard" className={navLinkClass}>
-              Dashboard
-            </NavLink>
-            <NavLink to="/tasks/new" className={navLinkClass}>
-              New task
-            </NavLink>
-            <span className="text-sm text-slate-400 dark:text-slate-500">
-              Logout (soon)
-            </span>
           </nav>
         )}
       </div>

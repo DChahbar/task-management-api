@@ -8,6 +8,8 @@ import { LoginPage } from '../pages/LoginPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { RegisterPage } from '../pages/RegisterPage'
 import { TaskFormPage } from '../pages/TaskFormPage'
+import { GuestOnlyRoute } from './GuestOnlyRoute'
+import { ProtectedRoute } from './ProtectedRoute'
 
 export function AppRoutes() {
   return (
@@ -17,14 +19,18 @@ export function AppRoutes() {
       </Route>
 
       <Route element={<AuthLayout />}>
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
+        <Route element={<GuestOnlyRoute />}>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+        </Route>
       </Route>
 
-      <Route element={<AppShellLayout />}>
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="tasks/new" element={<TaskFormPage />} />
-        <Route path="tasks/:taskId/edit" element={<TaskFormPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppShellLayout />}>
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="tasks/new" element={<TaskFormPage />} />
+          <Route path="tasks/:taskId/edit" element={<TaskFormPage />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
