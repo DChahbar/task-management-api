@@ -112,12 +112,13 @@ export function DashboardPage() {
     <>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeading
+          titleId="dashboard-title"
           title="Dashboard"
           description="View, filter, and manage your tasks."
         />
         <Link
           to="/tasks/new"
-          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white no-underline hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
+          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white no-underline hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:bg-blue-500 dark:hover:bg-blue-400 dark:focus-visible:outline-blue-400"
         >
           New task
         </Link>
@@ -183,7 +184,8 @@ export function DashboardPage() {
       )}
 
       {!isLoading && !error && hasTasks && (
-        <div
+        <section
+          aria-labelledby="dashboard-title"
           className={[
             'space-y-6',
             isRefetching ? 'pointer-events-none opacity-60' : '',
@@ -230,7 +232,7 @@ export function DashboardPage() {
               }
             />
           )}
-        </div>
+        </section>
       )}
     </>
   )

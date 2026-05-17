@@ -1,12 +1,16 @@
 interface PageHeadingProps {
   title: string
   description?: string
+  titleId?: string
 }
 
-export function PageHeading({ title, description }: PageHeadingProps) {
+export function PageHeading({ title, description, titleId }: PageHeadingProps) {
   return (
     <header className="mb-8">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-50">
+      <h1
+        id={titleId}
+        className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-50"
+      >
         {title}
       </h1>
       {description && (

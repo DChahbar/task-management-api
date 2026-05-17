@@ -8,6 +8,8 @@ import { getApiErrorMessage } from '../utils/errors'
 
 import { inputClassName } from '../components/ui/inputStyles'
 
+const LOGIN_ERROR_ID = 'login-error'
+
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -46,13 +48,18 @@ export function LoginPage() {
       />
 
       {error && (
-        <FormAlert message={error} onDismiss={() => setError(null)} />
+        <FormAlert
+          id={LOGIN_ERROR_ID}
+          message={error}
+          onDismiss={() => setError(null)}
+        />
       )}
 
       <form
         className="mt-4 space-y-4"
         onSubmit={handleSubmit}
         aria-label="Log in form"
+        aria-describedby={error ? LOGIN_ERROR_ID : undefined}
       >
         <div>
           <label
@@ -68,6 +75,7 @@ export function LoginPage() {
             autoComplete="email"
             required
             disabled={isSubmitting}
+            aria-invalid={Boolean(error)}
             className={inputClassName}
             placeholder="you@example.com"
           />
@@ -87,6 +95,7 @@ export function LoginPage() {
             autoComplete="current-password"
             required
             disabled={isSubmitting}
+            aria-invalid={Boolean(error)}
             className={inputClassName}
             placeholder="••••••••"
           />

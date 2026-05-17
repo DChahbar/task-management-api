@@ -1,6 +1,7 @@
 type AlertVariant = 'error' | 'info' | 'success'
 
 interface AlertProps {
+  id?: string
   variant?: AlertVariant
   title?: string
   message: string
@@ -16,14 +17,20 @@ const variantStyles: Record<AlertVariant, string> = {
 }
 
 export function Alert({
+  id,
   variant = 'error',
   title,
   message,
   onDismiss,
 }: AlertProps) {
+  const isAssertive = variant === 'error'
+
   return (
     <div
-      role="alert"
+      id={id}
+      role={isAssertive ? 'alert' : 'status'}
+      aria-live={isAssertive ? 'assertive' : 'polite'}
+      aria-atomic="true"
       className={`flex gap-3 rounded-lg border px-3 py-2 text-sm ${variantStyles[variant]}`}
     >
       <div className="min-w-0 flex-1">
@@ -34,13 +41,12 @@ export function Alert({
         <button
           type="button"
           onClick={onDismiss}
-          className="shrink-0 rounded px-1 text-sm font-medium opacity-70 hover:opacity-100"
+          className="shrink-0 rounded px-2 py-0.5 text-sm font-medium opacity-70 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           aria-label="Dismiss message"
         >
-          ×
+          <span aria-hidden="true">×</span>
         </button>
       )}
     </div>
   )
 }
-

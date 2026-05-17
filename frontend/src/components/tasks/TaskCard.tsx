@@ -135,7 +135,7 @@ export function TaskCard({
                   <Link
                     to={`/tasks/${task.id}/edit`}
                     tabIndex={isBusy ? -1 : undefined}
-                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 no-underline hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 no-underline hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800 dark:focus-visible:outline-blue-400"
                   >
                     Edit
                   </Link>
@@ -144,7 +144,7 @@ export function TaskCard({
                     onClick={() => onDelete(task.id)}
                     disabled={isBusy}
                     aria-label={`Delete task ${task.title}`}
-                    className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/50"
+                    className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/50"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
                   </button>

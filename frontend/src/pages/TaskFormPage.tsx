@@ -13,6 +13,7 @@ import { getApiErrorMessage } from '../utils/errors'
 
 const TITLE_MAX = 200
 const DESCRIPTION_MAX = 2000
+const SUBMIT_ERROR_ID = 'task-form-error'
 
 export function TaskFormPage() {
   const navigate = useNavigate()
@@ -163,6 +164,7 @@ export function TaskFormPage() {
       {submitError && (
         <div className="mb-4">
           <FormAlert
+            id={SUBMIT_ERROR_ID}
             message={submitError}
             onDismiss={() => setSubmitError(null)}
           />
@@ -173,6 +175,7 @@ export function TaskFormPage() {
         className="mx-auto max-w-lg space-y-4"
         onSubmit={handleSubmit}
         aria-label={isEditing ? 'Edit task form' : 'Create task form'}
+        aria-describedby={submitError ? SUBMIT_ERROR_ID : undefined}
       >
         <div>
           <label
@@ -190,6 +193,7 @@ export function TaskFormPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={isBusy}
+            aria-invalid={Boolean(submitError)}
             className={inputClassName}
             placeholder="Task title"
           />

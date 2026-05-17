@@ -8,6 +8,8 @@ import { getApiErrorMessage } from '../utils/errors'
 
 import { inputClassName } from '../components/ui/inputStyles'
 
+const REGISTER_ERROR_ID = 'register-error'
+
 export function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
@@ -43,13 +45,18 @@ export function RegisterPage() {
       />
 
       {error && (
-        <FormAlert message={error} onDismiss={() => setError(null)} />
+        <FormAlert
+          id={REGISTER_ERROR_ID}
+          message={error}
+          onDismiss={() => setError(null)}
+        />
       )}
 
       <form
         className="mt-4 space-y-4"
         onSubmit={handleSubmit}
         aria-label="Registration form"
+        aria-describedby={error ? REGISTER_ERROR_ID : undefined}
       >
         <div>
           <label
@@ -65,6 +72,7 @@ export function RegisterPage() {
             autoComplete="email"
             required
             disabled={isSubmitting}
+            aria-invalid={Boolean(error)}
             className={inputClassName}
             placeholder="you@example.com"
           />
@@ -85,6 +93,7 @@ export function RegisterPage() {
             required
             minLength={8}
             disabled={isSubmitting}
+            aria-invalid={Boolean(error)}
             className={inputClassName}
             placeholder="At least 8 characters"
           />

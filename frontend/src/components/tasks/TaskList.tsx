@@ -7,6 +7,7 @@ interface TaskListProps {
   onDelete: (taskId: number) => void
   togglingId: number | null
   deletingId: number | null
+  id?: string
 }
 
 export function TaskList({
@@ -15,9 +16,15 @@ export function TaskList({
   onDelete,
   togglingId,
   deletingId,
+  id = 'task-list-panel',
 }: TaskListProps) {
   return (
-    <ul className="space-y-3" aria-label="Task list">
+    <ul
+      id={id}
+      role="tabpanel"
+      aria-label="Filtered tasks"
+      className="space-y-3"
+    >
       {tasks.map((task) => (
         <TaskCard
           key={task.id}
