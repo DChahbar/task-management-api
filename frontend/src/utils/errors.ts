@@ -5,6 +5,10 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
     return fallback
   }
 
+  if (!error.response) {
+    return 'Cannot reach the API. Check that uvicorn is running on port 8000 and only one copy is active.'
+  }
+
   const detail = error.response?.data?.detail
 
   if (typeof detail === 'string') {
